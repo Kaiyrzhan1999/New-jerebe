@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Футбольная Жеребьёвка</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            font-family: 'Arial', sans-serif;
+            color: white;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .players-input {
+            background: rgba(0,0,0,0.5);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="number"] {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            border: none;
+            width: 200px;
+        }
+        button {
+            background: #fdbb2d;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+        button:hover {
+            transform: scale(1.05);
+            background: #ffd700;
+        }
+        .match-display {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 40px 0;
+            background: rgba(0,0,0,0.5);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .team {
+            text-align: center;
+            width: 300px;
+        }
+        .team-logo {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+            margin: 10px;
+            transition: all 0.5s;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            padding: 10px;
+        }
+        .vs {
+            font-size: 48px;
+            font-weight: bold;
+            color: #fdbb2d;
+            animation: pulse 1.5s infinite;
+        }
+        .score-input {
+            margin: 10px;
+        }
+        .score-input input {
+            width: 50px;
+            text-align: center;
+        }
+        .match-history {
+            background: rgba(0,0,0,0.5);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .spinning {
+            animation: spin 0.5s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotateY(0deg); }
+            to { transform: rotateY(360deg); }
+        }
+        .saved {
+            animation: saved 1s;
+        }
+        @keyframes saved {
+            0% { background-color: rgba(0,255,0,0.3); }
+            100% { background-color: transparent; }
+        }
+        .stats {
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.2);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .history-item {
+            background: rgba(255,255,255,0.1);
+            margin: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        .history-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.01);
+        }
+        .team-display {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .date-display {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚽ Футбольная Жеребьёвка ⚽</h1>
+        
+        <div class="players-input">
+            <h2>Имена игроков</h2>
+            <input type="text" id="player1" placeholder="Игрок 1" value="Мирас">
+            <input type="text" id="player2" placeholder="Игрок 2" value="Кайыржан">
+            <br>
+            <button id="newDrawBtn">Новая жеребьёвка</button>
+        </div>
+
+        <div class="match-display">
+            <div class="team" id="team1">
+                <h3 id="player1Name">Мирас</h3>
+                <img class="team-logo" id="logo1" src="https://via.placeholder.com/150?text=Команда+1" alt="Команда 1">
+                <div class="score-input">
+                    <input type="number" id="score1" min="0" value="0">
+                </div>
+            </div>
+            <div class="vs">VS</div>
+            <div class="team" id="team2">
+                <h3 id="player2Name">Кайыржан</h3>
+                <img class="team-logo" id="logo2" src="https://via.placeholder.com/150?text=Команда+2" alt="Команда 2">
+                <div class="score-input">
+                    <input type="number" id="score2" min="0" value="0">
+                </div>
+            </div>
+        </div>
+
+        <button id="drawTeamsBtn">Раздать команды</button>
+        <button id="saveResultBtn">Сохранить результат</button>
+        <button id="resetHistoryBtn" style="background: #f44336;">Сбросить историю</button>
+
+        <div class="match-history" id="matchHistory">
+            <h2>История матчей</h2>
+            <div id="statsDisplay" class="stats"></div>
+            <div id="historyList"></div>
+        </div>
+    </div>
+
+    <script>
+        // Используем ваши названия логотипов
+        const teams = [
+            { name: 'Арсенал', logo: 'arsenal-logo-145x100.png' },
+            { name: 'Атлетико Мадрид', logo: 'atletico-madrid-logo-145x100.png' },
+            { name: 'Барселона', logo: 'barcelona-big-296x300.png' },
+            { name: 'Байер Леверкузен', logo: 'bayer-04-leverkusen-logo-145x100.png' },
+            { name: 'Бавария', logo: 'bayern-munich-logo-145x100.png' },
+            { name: 'Боруссия Дортмунд', logo: 'borussia-dortmund-logo-145x100.png' },
+            { name: 'Челси', logo: 'chelsea-logo-145x100.png' },
+            { name: 'Интер', logo: 'inter-milan-logo-2021-145x100.png' },
+            { name: 'Ювентус', logo: 'juventus-logo-145x100.png' },
+            { name: 'Ливерпуль', logo: 'liverpool-logo-145x100.png' },
+            { name: 'Манчестер Сити', logo: 'manchester-city-logo-145x100.png' },
+            { name: 'Милан', logo: 'milan-logo-145x100.png' },
+            { name: 'Наполи', logo: 'napoli-logo-2024-145x100.png' },
+            { name: 'Ньюкасл Юнайтед', logo: 'newcastle-united-logo-145x100.png' },
+            { name: 'ПСЖ', logo: 'psg-logo-145x100.png' },
+            { name: 'РБ Лейпциг', logo: 'rb-leipzig-logo-145x100.png' },
+            { name: 'Реал Мадрид', logo: 'real-madrid-logo-145x100.png' },
+            { name: 'Тоттенхэм', logo: 'tottenham-hotspur-logo-145x100.png' }
+        ];
+
+        let availableTeams = [...teams];
+        let matchHistory = [];
+
+        // Получаем элементы кнопок
+        const newDrawBtn = document.getElementById('newDrawBtn');
+        const drawTeamsBtn = document.getElementById('drawTeamsBtn');
+        const saveResultBtn = document.getElementById('saveResultBtn');
+        const resetHistoryBtn = document.getElementById('resetHistoryBtn');
+
+        // Назначаем обработчики событий
+        newDrawBtn.addEventListener('click', startDraw);
+        drawTeamsBtn.addEventListener('click', startMatch);
+        saveResultBtn.addEventListener('click', saveResult);
+        resetHistoryBtn.addEventListener('click', resetHistory);
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'ru-RU';
+                utterance.rate = 1.2;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function startDraw() {
+            const player1 = document.getElementById('player1').value || 'Игрок 1';
+            const player2 = document.getElementById('player2').value || 'Игрок 2';
+            
+            document.getElementById('player1Name').textContent = player1;
+            document.getElementById('player2Name').textContent = player2;
+
+            document.getElementById('score1').value = 0;
+            document.getElementById('score2').value = 0;
+
+            speak("Начинаем жеребьёвку!");
+        }
+
+        function startMatch() {
+            if (availableTeams.length < 2) {
+                availableTeams = [...teams];
+                speak("Все команды были использованы. Начинаем заново!");
+            }
+
+            const logos = document.querySelectorAll('.team-logo');
+            logos.forEach(logo => logo.classList.add('spinning'));
+
+            setTimeout(() => {
+                shuffleArray(availableTeams);
+                const team1 = availableTeams.pop();
+                const team2 = availableTeams.pop();
+
+                document.getElementById('logo1').src = team1.logo;
+                document.getElementById('logo2').src = team2.logo;
+
+                logos.forEach(logo => logo.classList.remove('spinning'));
+
+                speak(`${team1.name} против ${team2.name}!`);
+            }, 1500);
+        }
+
+        function saveResult() {
+            const player1 = document.getElementById('player1Name').textContent;
+            const player2 = document.getElementById('player2Name').textContent;
+            const score1 = parseInt(document.getElementById('score1').value);
+            const score2 = parseInt(document.getElementById('score2').value);
+            
+            if (isNaN(score1)) {
+                alert("Введите корректный счёт для первого игрока!");
+                return;
+            }
+            
+            if (isNaN(score2)) {
+                alert("Введите корректный счёт для второго игрока!");
+                return;
+            }
+
+            const match = {
+                player1,
+                player2,
+                score1,
+                score2,
+                team1Logo: document.getElementById('logo1').src,
+                team2Logo: document.getElementById('logo2').src,
+                date: new Date().toLocaleString()
+            };
+
+            matchHistory.unshift(match);
+            updateHistory();
+
+            document.getElementById('matchHistory').classList.add('saved');
+            setTimeout(() => {
+                document.getElementById('matchHistory').classList.remove('saved');
+            }, 1000);
+
+            if (score1 > score2) {
+                speak(`${player1} побеждает ${score1}:${score2}`);
+            } else if (score1 < score2) {
+                speak(`${player2} побеждает ${score2}:${score1}`);
+            } else {
+                speak(`Ничья ${score1}:${score2}`);
+            }
+        }
+
+        function updateHistory() {
+            const historyList = document.getElementById('historyList');
+            const statsDisplay = document.getElementById('statsDisplay');
+            
+            const wins = {};
+            matchHistory.forEach(match => {
+                if (match.score1 > match.score2) {
+                    wins[match.player1] = (wins[match.player1] || 0) + 1;
+                } else if (match.score1 < match.score2) {
+                    wins[match.player2] = (wins[match.player2] || 0) + 1;
+                }
+            });
+
+            statsDisplay.innerHTML = `
+                <h3>Статистика</h3>
+                ${Object.keys(wins).length > 0 
+                    ? Object.entries(wins).map(([player, count]) => 
+                        `<div>${player}: ${count} побед${count > 1 && count < 5 ? 'ы' : ''}</div>`
+                      ).join('')
+                    : '<div>Нет данных</div>'}
+            `;
+
+            historyList.innerHTML = matchHistory.map(match => `
+                <div class="history-item">
+                    <div class="team-display">
+                        <img src="${match.team1Logo}" style="width:50px;height:50px;object-fit:contain;">
+                        <span><strong>${match.player1}</strong> ${match.score1}-${match.score2} <strong>${match.player2}</strong></span>
+                        <img src="${match.team2Logo}" style="width:50px;height:50px;object-fit:contain;">
+                    </div>
+                    <div class="date-display">${match.date}</div>
+                </div>
+            `).join('');
+        }
+
+        function resetHistory() {
+            if (confirm("Очистить всю историю?")) {
+                matchHistory = [];
+                availableTeams = [...teams];
+                updateHistory();
+                speak("История очищена");
+            }
+        }
+
+        // Инициализация
+        window.onload = function() {
+            updateHistory();
+            speak("Готов к жеребьёвке!");
+        };
+    </script>
+</body>
+</html>
