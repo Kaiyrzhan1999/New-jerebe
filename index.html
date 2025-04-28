@@ -2,149 +2,279 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Футбольная Жеребьёвка</title>
     <style>
+        :root {
+            --primary-color: #fdbb2d;
+            --secondary-color: #1a2a6c;
+            --accent-color: #b21f1f;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
         body {
             margin: 0;
-            padding: 20px;
+            padding: 15px;
             min-height: 100vh;
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color), var(--primary-color));
             font-family: 'Arial', sans-serif;
             color: white;
+            -webkit-tap-highlight-color: transparent;
         }
+        
         .container {
-            max-width: 1200px;
+            max-width: 100%;
             margin: 0 auto;
             text-align: center;
+            padding-bottom: 20px;
         }
+        
+        h1 {
+            margin: 15px 0;
+            font-size: clamp(24px, 5vw, 36px);
+        }
+        
         .players-input {
             background: rgba(0,0,0,0.5);
-            padding: 20px;
+            padding: 15px;
             border-radius: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
+        
+        .players-input h2 {
+            margin-bottom: 10px;
+            font-size: clamp(18px, 4vw, 24px);
+        }
+        
+        .input-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
         input[type="text"], input[type="number"] {
-            padding: 10px;
-            margin: 5px;
-            border-radius: 5px;
+            padding: 10px 12px;
+            margin: 5px 0;
+            border-radius: 8px;
             border: none;
-            width: 200px;
+            width: 100%;
+            max-width: 280px;
+            font-size: 16px;
         }
+        
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
         button {
-            background: #fdbb2d;
+            background: var(--primary-color);
             color: #000;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            padding: 12px 20px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            margin: 10px;
+            font-size: 16px;
             transition: all 0.3s;
+            flex: 1 1 auto;
+            min-width: 160px;
+            max-width: 100%;
         }
+        
         button:hover {
             transform: scale(1.05);
             background: #ffd700;
         }
+        
+        button.danger {
+            background: #f44336;
+        }
+        
         .match-display {
             display: flex;
-            justify-content: space-around;
+            flex-direction: column;
             align-items: center;
-            margin: 40px 0;
+            margin: 20px 0;
             background: rgba(0,0,0,0.5);
-            padding: 20px;
+            padding: 15px;
             border-radius: 10px;
+            gap: 15px;
         }
+        
+        @media (min-width: 768px) {
+            .match-display {
+                flex-direction: row;
+                justify-content: space-around;
+            }
+        }
+        
         .team {
             text-align: center;
-            width: 300px;
+            width: 100%;
+            max-width: 300px;
         }
+        
+        .team h3 {
+            margin: 10px 0;
+            font-size: clamp(18px, 4vw, 22px);
+        }
+        
         .team-logo {
-            width: 150px;
-            height: 150px;
+            width: 120px;
+            height: 120px;
             object-fit: contain;
-            margin: 10px;
+            margin: 10px auto;
             transition: all 0.5s;
             background: rgba(255,255,255,0.1);
             border-radius: 50%;
             padding: 10px;
         }
+        
+        @media (min-width: 480px) {
+            .team-logo {
+                width: 150px;
+                height: 150px;
+            }
+        }
+        
         .vs {
-            font-size: 48px;
+            font-size: 32px;
             font-weight: bold;
-            color: #fdbb2d;
+            color: var(--primary-color);
             animation: pulse 1.5s infinite;
+            margin: 10px 0;
         }
+        
+        @media (min-width: 768px) {
+            .vs {
+                font-size: 48px;
+                margin: 0;
+            }
+        }
+        
         .score-input {
-            margin: 10px;
+            margin: 10px 0;
         }
+        
         .score-input input {
-            width: 50px;
-            text-align: center;
+            width: 60px;
+            height: 40px;
+            font-size: 18px;
         }
+        
         .match-history {
             background: rgba(0,0,0,0.5);
-            padding: 20px;
+            padding: 15px;
             border-radius: 10px;
             margin-top: 20px;
         }
+        
+        .match-history h2 {
+            margin-bottom: 15px;
+            font-size: clamp(20px, 4vw, 24px);
+        }
+        
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
         }
+        
         .spinning {
             animation: spin 0.5s linear infinite;
         }
+        
         @keyframes spin {
             from { transform: rotateY(0deg); }
             to { transform: rotateY(360deg); }
         }
+        
         .saved {
             animation: saved 1s;
         }
+        
         @keyframes saved {
             0% { background-color: rgba(0,255,0,0.3); }
             100% { background-color: transparent; }
         }
+        
         .stats {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             background: rgba(255,255,255,0.2);
-            padding: 10px;
-            border-radius: 5px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
         }
+        
+        .stats h3 {
+            margin-bottom: 8px;
+        }
+        
         .history-item {
             background: rgba(255,255,255,0.1);
-            margin: 10px;
-            padding: 10px;
-            border-radius: 5px;
+            margin: 10px 0;
+            padding: 12px;
+            border-radius: 8px;
             transition: all 0.3s;
         }
+        
         .history-item:hover {
             background: rgba(255,255,255,0.2);
             transform: scale(1.01);
         }
+        
         .team-display {
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
             align-items: center;
+            gap: 10px;
         }
+        
+        .team-display img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        
+        .team-display span {
+            flex-grow: 1;
+            text-align: center;
+            font-size: 16px;
+        }
+        
         .date-display {
             font-size: 12px;
             color: #aaa;
-            margin-top: 5px;
+            margin-top: 8px;
+            text-align: right;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>⚽ Футбольная Жеребьёвка ⚽</h1>
+        <h1>⚽ Мясорубка ⚽</h1>
         
         <div class="players-input">
             <h2>Имена игроков</h2>
-            <input type="text" id="player1" placeholder="Игрок 1" value="Мирас">
-            <input type="text" id="player2" placeholder="Игрок 2" value="Кайыржан">
-            <br>
-            <button id="newDrawBtn">Новая жеребьёвка</button>
+            <div class="input-row">
+                <input type="text" id="player1" placeholder="Игрок 1" value="Мирас">
+                <input type="text" id="player2" placeholder="Игрок 2" value="Кайыржан">
+            </div>
+            <div class="button-group">
+                <button id="newDrawBtn">Новая жеребьёвка</button>
+            </div>
         </div>
 
         <div class="match-display">
@@ -165,9 +295,11 @@
             </div>
         </div>
 
-        <button id="drawTeamsBtn">Раздать команды</button>
-        <button id="saveResultBtn">Сохранить результат</button>
-        <button id="resetHistoryBtn" style="background: #f44336;">Сбросить историю</button>
+        <div class="button-group">
+            <button id="drawTeamsBtn">Раздать команды</button>
+            <button id="saveResultBtn">Сохранить результат</button>
+            <button id="resetHistoryBtn" class="danger">Сбросить историю</button>
+        </div>
 
         <div class="match-history" id="matchHistory">
             <h2>История матчей</h2>
@@ -252,6 +384,9 @@
             const logos = document.querySelectorAll('.team-logo');
             logos.forEach(logo => logo.classList.add('spinning'));
 
+            // Блокируем кнопку на время анимации
+            drawTeamsBtn.disabled = true;
+            
             setTimeout(() => {
                 shuffleArray(availableTeams);
                 const team1 = availableTeams.pop();
@@ -261,6 +396,7 @@
                 document.getElementById('logo2').src = team2.logo;
 
                 logos.forEach(logo => logo.classList.remove('spinning'));
+                drawTeamsBtn.disabled = false;
 
                 speak(`${team1.name} против ${team2.name}!`);
             }, 1500);
@@ -334,9 +470,9 @@
             historyList.innerHTML = matchHistory.map(match => `
                 <div class="history-item">
                     <div class="team-display">
-                        <img src="${match.team1Logo}" style="width:50px;height:50px;object-fit:contain;">
+                        <img src="${match.team1Logo}" alt="${match.player1}">
                         <span><strong>${match.player1}</strong> ${match.score1}-${match.score2} <strong>${match.player2}</strong></span>
-                        <img src="${match.team2Logo}" style="width:50px;height:50px;object-fit:contain;">
+                        <img src="${match.team2Logo}" alt="${match.player2}">
                     </div>
                     <div class="date-display">${match.date}</div>
                 </div>
@@ -353,10 +489,21 @@
         }
 
         // Инициализация
-        window.onload = function() {
+        document.addEventListener('DOMContentLoaded', function() {
             updateHistory();
-            speak("Готов к жеребьёвке!");
-        };
+            setTimeout(() => {
+                speak("Готов к жеребьёвке!");
+            }, 500);
+            
+            // Оптимизация для мобильных устройств
+            if (/Mobi|Android/i.test(navigator.userAgent)) {
+                document.querySelectorAll('input[type="number"]').forEach(input => {
+                    input.addEventListener('focus', function() {
+                        window.scrollTo(0, this.offsetTop - 100);
+                    });
+                });
+            }
+        });
     </script>
 </body>
 </html>
