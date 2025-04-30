@@ -103,7 +103,9 @@
         
         .match-display {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: space-around;
             align-items: center;
             margin: 20px 0;
             background: rgba(0,0,0,0.5);
@@ -112,17 +114,13 @@
             gap: 15px;
         }
         
-        @media (min-width: 768px) {
-            .match-display {
-                flex-direction: row;
-                justify-content: space-around;
-            }
-        }
-        
         .team {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             text-align: center;
-            width: 100%;
-            max-width: 300px;
+            min-width: 150px;
+            flex: 1;
         }
         
         .team h3 {
@@ -131,8 +129,8 @@
         }
         
         .team-logo {
-            width: 120px;
-            height: 120px;
+            width: 100px;
+            height: 100px;
             object-fit: contain;
             margin: 10px auto;
             transition: all 0.5s;
@@ -142,6 +140,13 @@
         }
         
         @media (min-width: 480px) {
+            .team-logo {
+                width: 120px;
+                height: 120px;
+            }
+        }
+        
+        @media (min-width: 768px) {
             .team-logo {
                 width: 150px;
                 height: 150px;
@@ -153,14 +158,8 @@
             font-weight: bold;
             color: var(--primary-color);
             animation: pulse 1.5s infinite;
-            margin: 10px 0;
-        }
-        
-        @media (min-width: 768px) {
-            .vs {
-                font-size: 48px;
-                margin: 0;
-            }
+            margin: 0 10px;
+            align-self: center;
         }
         
         .score-input {
@@ -264,7 +263,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>⚽ Мясорубка ⚽</h1>
+        <h1>⚽ Футбольная Жеребьёвка ⚽</h1>
         
         <div class="players-input">
             <h2>Имена игроков</h2>
@@ -285,7 +284,9 @@
                     <input type="number" id="score1" min="0" value="0">
                 </div>
             </div>
+            
             <div class="vs">VS</div>
+            
             <div class="team" id="team2">
                 <h3 id="player2Name">Кайыржан</h3>
                 <img class="team-logo" id="logo2" src="https://via.placeholder.com/150?text=Команда+2" alt="Команда 2">
@@ -334,17 +335,25 @@
         let availableTeams = [...teams];
         let matchHistory = [];
 
-        // Получаем элементы кнопок
+        // Получаем элементы кнопок и полей ввода
         const newDrawBtn = document.getElementById('newDrawBtn');
         const drawTeamsBtn = document.getElementById('drawTeamsBtn');
         const saveResultBtn = document.getElementById('saveResultBtn');
         const resetHistoryBtn = document.getElementById('resetHistoryBtn');
+        const score1Input = document.getElementById('score1');
+        const score2Input = document.getElementById('score2');
 
         // Назначаем обработчики событий
         newDrawBtn.addEventListener('click', startDraw);
         drawTeamsBtn.addEventListener('click', startMatch);
         saveResultBtn.addEventListener('click', saveResult);
         resetHistoryBtn.addEventListener('click', resetHistory);
+
+        // Функция сброса счета
+        function resetScores() {
+            score1Input.value = 0;
+            score2Input.value = 0;
+        }
 
         function speak(text) {
             if ('speechSynthesis' in window) {
@@ -369,9 +378,7 @@
             document.getElementById('player1Name').textContent = player1;
             document.getElementById('player2Name').textContent = player2;
 
-            document.getElementById('score1').value = 0;
-            document.getElementById('score2').value = 0;
-
+            resetScores();
             speak("Начинаем жеребьёвку!");
         }
 
@@ -380,6 +387,9 @@
                 availableTeams = [...teams];
                 speak("Все команды были использованы. Начинаем заново!");
             }
+
+            // Сбрасываем счет перед новой жеребьевкой
+            resetScores();
 
             const logos = document.querySelectorAll('.team-logo');
             logos.forEach(logo => logo.classList.add('spinning'));
@@ -405,8 +415,8 @@
         function saveResult() {
             const player1 = document.getElementById('player1Name').textContent;
             const player2 = document.getElementById('player2Name').textContent;
-            const score1 = parseInt(document.getElementById('score1').value);
-            const score2 = parseInt(document.getElementById('score2').value);
+            const score1 = parseInt(score1Input.value);
+            const score2 = parseInt(score2Input.value);
             
             if (isNaN(score1)) {
                 alert("Введите корректный счёт для первого игрока!");
@@ -490,6 +500,7 @@
 
         // Инициализация
         document.addEventListener('DOMContentLoaded', function() {
+            resetScores(); // Сбрасываем счет при загрузке
             updateHistory();
             setTimeout(() => {
                 speak("Готов к жеребьёвке!");
